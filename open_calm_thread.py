@@ -12,7 +12,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import threading
 from geopy.geocoders import Nominatim
 
-# from config import prompt_queue, LOCATION
+from config import prompt_queue, LOCATION
 
 class OpenCALM(threading.Thread):
     def __init__(self, prompt_queue, location):

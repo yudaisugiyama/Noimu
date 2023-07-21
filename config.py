@@ -21,3 +21,6 @@ INFO_TOPIC = "info"
 # OpenCALMの設定
 LOCATION = "長岡技術科学大学"
 open_calm = OpenCALM(prompt_queue=prompt_queue, location=LOCATION)
+
+# AWSの設定
+REGION = "ap-northeast-1"

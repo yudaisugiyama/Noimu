@@ -5,22 +5,18 @@
 from typing import *
 
 from communication_thread import Communicator
-from open_calm_thread import OpenCALM
-from config import feedback_queue
+from config import feedback_queue, open_calm
 
 
 def initialize() -> Communicator:
-    # LLMモデルとスレッド生成
-    open_calm = OpenCALM()
-
     # 通信用スレッド生成
     communicator = Communicator()  # Unityとの通信機
 
-    return open_calm, communicator
+    return communicator
 
 
 def main():
-    open_calm, communicator = initialize()
+    communicator = initialize()
 
     # スレッドの開始
     communicator.start()

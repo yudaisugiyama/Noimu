@@ -1,6 +1,7 @@
 # mqtt通信用のスレッドを実装する
 # 音楽ファイルは常に最新のものが"../wavs/music.wav"にあるので、それを渡せばいい
 
+import os
 import time
 import json
 import threading
@@ -8,6 +9,10 @@ from queue import Queue
 from paho.mqtt import client as mqtt
 
 from config import MUSIC_PATH, CLIENT_ID, HOST, PORT, KEEP_ALIVE, FEEDBACK_TOPIC, INFO_TOPIC, feedback_queue, prompt_queue, open_calm
+
+from utils import get_s3, plot
+
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 
 """以下の1と2をスレッド実行するクラス
 
@@ -41,22 +46,25 @@ def on_message(client, userdata, msg):
         # リクエストに応じて処理
         request = query_info['request']
 
-        if request == 'start_learning':
+        if request == 'compute_main_function':
             print('+ Start learning process.')
 
             # キューにフィードバックを入れる
             feedback_queue.put(query_info['feedback'])
-            print(query_info['feedback'])
+
+            # OpenCALMを起動
+            open_calm.start()
+            time.sleep(5)
+            noimu_words = prompt_queue.get()
+            client.publish(INFO_TOPIC, noimu_words)
+            key_name = 'music.png'
+
+            # 睡眠時間のグラフを作成
+            print('+ Create sleep graph.')
+            s3 = get_s3()
+            s3.Object(S3_BUCKET_NAME, key_name).upload_file(key_name)
 
         elif request == 'sound_file':
             print('+ Send sound file info.')
             client.publish(INFO_TOPIC, MUSIC_PATH)
             print("+ Publish")
-
-        elif request == 'open_calm':
-            print('+ Send prompt to open calm.')
-            open_calm.start()
-            time.sleep(5)
-            noimu_words = prompt_queue.get()
-            print(noimu_words)
-            client.publish(INFO_TOPIC, noimu_words)
