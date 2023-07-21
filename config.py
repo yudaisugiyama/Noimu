@@ -1,6 +1,7 @@
 # 各種設定を行うファイル
 
 from queue import Queue
+from open_calm_thread import OpenCALM
 
 # Unityに渡す音楽のパス
 MUSIC_PATH = "music.wav"
@@ -14,8 +15,9 @@ CLIENT_ID = "foge"
 HOST = "localhost"
 PORT = 1883
 KEEP_ALIVE = 60
-TOPIC1 = "foge"
-TOPIC2 = "piyo"
+FEEDBACK_TOPIC = "feedback"
+INFO_TOPIC = "info"
 
 # OpenCALMの設定
 LOCATION = "長岡技術科学大学"
+open_calm = OpenCALM(prompt_queue=prompt_queue, location=LOCATION)
