@@ -5,7 +5,7 @@ from communication_thread import Communicator
 
 from soundAI.rl_model import RLModel
 
-from config import feedback_queue
+from config import feedback_queue, prompt_queue
 
 
 def initialize() -> Tuple[DQN, Communicator]:
@@ -17,7 +17,7 @@ def initialize() -> Tuple[DQN, Communicator]:
 
     # 強化学習モデルとスレッド生成
     model = RLModel()  # モデル生成
-    dqn = DQN(model, feedback_queue)
+    dqn = DQN(model, feedback_queue, prompt_queue)
 
     # 通信用スレッド生成
     communicator = Communicator()  # Unityとの通信機
