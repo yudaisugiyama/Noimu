@@ -33,6 +33,7 @@ def main():
 
     while True:
         key_name, file_name = event_control_queue.get()
+        # 学習終わりとグラフ
         print(f"+ Upload {key_name} {file_name}.")
         time.sleep(1)
 
