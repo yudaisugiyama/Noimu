@@ -65,6 +65,7 @@ def on_message(client, userdata, msg):
 
             # 睡眠時間のグラフを作成
             print('+ Create sleep graph.')
+            print(query_info['sleep_time'])
 
         elif request == 'sound_file':
             print('+ Send sound file info.')

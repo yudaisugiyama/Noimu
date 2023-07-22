@@ -1,6 +1,6 @@
 # Noimu | TNuts
 
-### シーケンス
+### シーケンスフロー
 ```mermaid
 sequenceDiagram
     participant Unity
@@ -9,10 +9,10 @@ sequenceDiagram
 
     Unity->>+Unity: アラームを止める
     activate Unity
-    Unity->>+Python: フィードバックの送信
+    Unity->>+Python: フィードバックの送信(compute_main_function)
     activate Python
     Python->>Python: OpenCALM
-    Python-->>Unity: text
+    Python-->>Unity: {"words": "noimu_words"}
     deactivate Unity
     deactivate Python
     Unity->>+Unity: ノイミューの吹き出し出力
@@ -35,10 +35,52 @@ sequenceDiagram
 
     Unity->>+Unity: アラームを設定
     activate Unity
+    Unity->>+Python: 音ファイルのリクエスト(sound_file)
+    Python-->-Unity: {"value": "music.wav"}
+    activate Python
     Unity->>+S3: music.wavのダウンロードリクエスト
     S3-->>-Unity: music.wav
     Unity->>Unity: アラーム設定完了
     deactivate Unity
 
     Unity->>+Unity: ノイミューにおやすみ（睡眠時間カウンタースタート）
+```
+
+### MQTT通信仕様
+
+```
+# Unity => Python
+
+## フィードバックの送信
+msg = {
+    "request": "compute_main_function",
+    "feedback": {
+        "audio_prompt": "jpop",
+        "elapsed_time": 999,
+    },
+    "sleep_time": 999,
+}
+
+
+## 音ファイルのリクエスト
+msg = {
+    "request": "sound_file",
+}
+
+
+
+# Python => Unity
+
+## ノイミューの言葉の送信
+msg = {
+    "request": "noimu_words",
+    "value": "おはよ〜、今日の睡眠時間はxx時間で、・・・",
+}
+
+
+## 音ファイルのリクエスト
+msg = {
+    "request": "sound_file",
+    "value": "music.wav",
+}
 ```
