@@ -19,8 +19,8 @@ class RLModel:
 
         # ネットワーク定義
         self.network = ShallowQNetwork(num_categories=num_categories, num_category_contents=num_category_contents, num_hidden=num_hidden)  # DQN風ネットワーク
-        self.latest_actions = deque(5)  # 直近の行動を記録
-        self.latest_feedbacks = deque(5)  # 直近のフィードバック（報酬）を記録
+        self.latest_actions = deque(maxlen=5)  # 直近の行動を記録
+        self.latest_feedbacks = deque(maxlen=5)  # 直近のフィードバック（報酬）を記録
 
         # カテゴリ管理クラス
         self.catman = CategoryManager(category_names=categories, category_postfixes=[" ", "."])
