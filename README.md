@@ -1,4 +1,4 @@
-# Noimyu | TNuts
+# Noimu | TNuts
 
 ### シーケンス
 ```mermaid
@@ -11,16 +11,16 @@ sequenceDiagram
     activate Unity
     Unity->>+Python: フィードバックの送信
     activate Python
-    Python->>Python: 強化学習
-    Python-->>S3: music.wav
-    deactivate Python
-    activate Python
     Python->>Python: OpenCALM
     Python-->>Unity: text
     deactivate Unity
-
     deactivate Python
     Unity->>+Unity: ノイミューの吹き出し出力
+    activate Python
+    Python->>Python: 強化学習
+    Python-->>S3: music.wav
+
+    deactivate Python
     activate Python
     Python->>Python: 睡眠時間のグラフ作成
     Python-->>S3: graph.png
