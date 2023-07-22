@@ -4,7 +4,7 @@ from queue import Queue
 from open_calm_thread import OpenCALM
 
 # Unityに渡す音楽のパス
-MUSIC_PATH = "music.wav"
+MUSIC_PATH = "Test.wav"
 
 # 人間からのフィードバック時間を受け渡すキュー
 feedback_queue = Queue()
@@ -12,7 +12,8 @@ prompt_queue = Queue()
 
 # MQTTの設定
 CLIENT_ID = "foge"
-HOST = "localhost"
+# HOST = "localhost"
+HOST = "192.168.10.101"
 PORT = 1883
 KEEP_ALIVE = 60
 FEEDBACK_TOPIC = "feedback"

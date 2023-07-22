@@ -29,8 +29,8 @@ def main():
     dqn, communicator = initialize()
 
     # スレッドの開始
-    dqn.start()
     communicator.start()
+    dqn.start()
 
 
 if __name__ == "__main__":

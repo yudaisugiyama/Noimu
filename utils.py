@@ -32,8 +32,9 @@ def get_s3():
                       aws_session_token=token,
                       region_name=REGION)
     s3 = session.resource('s3')
+    s3.Object("noimu", "test3.wav").upload_file("test/test.wav")
 
-    return s3
+    # return s3
 
 
 def plot():

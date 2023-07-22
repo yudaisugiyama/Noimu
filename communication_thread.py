@@ -12,13 +12,14 @@ from config import MUSIC_PATH, CLIENT_ID, HOST, PORT, KEEP_ALIVE, FEEDBACK_TOPIC
 
 from utils import get_s3, plot
 
-S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
 
 """以下の1と2をスレッド実行するクラス
 
 1. Unityから `sound_file_id_request` を受け取って、MUSIC_PATHの音楽をUnityに送信する
 2. Unityから時間 `elapsed_time` を受け取って、 feedback_queueに入れる
 """
+
 
 class Communicator(threading.Thread):
     def __init__(self):
@@ -47,24 +48,30 @@ def on_message(client, userdata, msg):
         request = query_info['request']
 
         if request == 'compute_main_function':
-            print('+ Start learning process.')
-
             # キューにフィードバックを入れる
             feedback_queue.put(query_info['feedback'])
+            print(query_info['feedback'])
 
-            # OpenCALMを起動
-            open_calm.start()
-            time.sleep(5)
+            # ノイミューの言葉を取得してUnityに送信
             noimu_words = prompt_queue.get()
-            client.publish(INFO_TOPIC, noimu_words)
-            key_name = 'music.png'
+            data = {
+                "request": "noimu_words",
+                "value": noimu_words,
+            }
+            msg = json.dumps(dict(data), indent=0)
+            client.publish(INFO_TOPIC, msg)
+
+            print(noimu_words)
 
             # 睡眠時間のグラフを作成
             print('+ Create sleep graph.')
-            s3 = get_s3()
-            s3.Object(S3_BUCKET_NAME, key_name).upload_file(key_name)
 
         elif request == 'sound_file':
             print('+ Send sound file info.')
-            client.publish(INFO_TOPIC, MUSIC_PATH)
-            print("+ Publish")
+            data = {
+                "request": "sound_file",
+                "value": MUSIC_PATH,
+            }
+            msg = json.dumps(dict(data), indent=0)
+            client.publish(INFO_TOPIC, msg)
+            print("+ Publish sound file info.")

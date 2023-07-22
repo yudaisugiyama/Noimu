@@ -7,6 +7,8 @@ from typing import *
 from communication_thread import Communicator
 from config import feedback_queue, open_calm
 
+from utils import get_s3, plot
+
 
 def initialize() -> Communicator:
     # 通信用スレッド生成
@@ -17,6 +19,12 @@ def initialize() -> Communicator:
 
 def main():
     communicator = initialize()
+
+    try:
+        get_s3()
+        print("+ Upload 'grapth.png'.")
+    except Exception as e:
+        print(f"S3 UPLOAD ERROR: {e}")
 
     # スレッドの開始
     communicator.start()
