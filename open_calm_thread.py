@@ -52,7 +52,7 @@ class OpenCALM(threading.Thread):
             output = self.tokenizer.decode(tokens[0], skip_special_tokens=True)
             output = output.replace('\n', '')
             self.prompt_queue.put(output)
-            time.sleep(2)
+            time.sleep(1)
 
 
     def get_location_info(self) -> tuple[str, str]:

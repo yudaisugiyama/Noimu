@@ -8,7 +8,7 @@ import threading
 from queue import Queue
 from paho.mqtt import client as mqtt
 
-from config import MUSIC_PATH, CLIENT_ID, HOST, PORT, KEEP_ALIVE, FEEDBACK_TOPIC, INFO_TOPIC, feedback_queue, prompt_queue, open_calm
+from config import MUSIC_PATH, CLIENT_ID, HOST, PORT, KEEP_ALIVE, FEEDBACK_TOPIC, INFO_TOPIC, feedback_queue, prompt_queue, event_control_queue, open_calm
 
 from utils import get_s3, plot
 
@@ -65,7 +65,15 @@ def on_message(client, userdata, msg):
 
             # 睡眠時間のグラフを作成
             print('+ Create sleep graph.')
-            print(query_info['sleep_time'])
+            try:
+                print(query_info['sleep_time'])
+                fig = plot()
+                event_control_queue.put(fig)
+
+            except:
+                key_name, file_name = "test", "test"
+                msg = [key_name, file_name]
+                event_control_queue.put(msg)
 
         elif request == 'sound_file':
             print('+ Send sound file info.')
