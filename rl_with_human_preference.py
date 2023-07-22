@@ -32,6 +32,10 @@ def main():
     communicator.start()
     dqn.start()
 
+    # 無限ループの終了待ち
+    communicator.join()
+    dqn.join()
+
 
 if __name__ == "__main__":
     main()

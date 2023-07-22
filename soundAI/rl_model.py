@@ -1,13 +1,29 @@
 from collections import deque
 import torch
 
+from .net import ShallowQNetwork
+from .cateory_management import CategoryManager
+
 
 class RLModel:
-    def __init__(self) -> None:
-        self.network = ...  # DQN風ネットワーク
+    def __init__(self, categories=[["delightful", "depressing"], ["jazz", "rock"]], num_hidden=32) -> None:
+        """強化学習モデルの生成
+
+        Args:
+            categories (list[str]): カテゴリのリスト
+            num_hidden (_type_): 1層存在する隠れ層のノードの数
+        """
+        # カテゴリの数を数える
+        num_categories = len(categories)
+        num_category_contents = [len(category) for category in categories]
+
+        # ネットワーク定義
+        self.network = ShallowQNetwork(num_categories=num_categories, num_category_contents=num_category_contents, num_hidden=num_hidden)  # DQN風ネットワーク
         self.latest_actions = deque(5)  # 直近の行動を記録
         self.latest_feedbacks = deque(5)  # 直近のフィードバック（報酬）を記録
-        raise NotImplementedError
+
+        # カテゴリ管理クラス
+        self.catman = CategoryManager(category_names=categories, category_postfixes=[" ", "."])
 
     def add_feedback(self, feedback: dict) -> None:
         """学習に使う、ユーザーからのフィードバックを記録する
@@ -19,7 +35,7 @@ class RLModel:
                 "elapsed_time": 起きるまでにかかった時間
         """
         # プロンプトを行動idと対応させて記録する
-        action_id = self._prompt2action_id(feedback["prompt_text"])
+        action_id = self.catman.prompt_to_action_id(feedback["prompt_text"], self.network)
         self.latest_actions.append(action_id)
 
         # フィードバックを記録する
