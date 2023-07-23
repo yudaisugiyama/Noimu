@@ -1,18 +1,16 @@
 import os
-
 import boto3
-from boto3.session import Session
-from dotenv import load_dotenv
-
 import pandas as pd
+from dotenv import load_dotenv
 import matplotlib.pyplot as plt
-
-from config import REGION
+from datetime import datetime
+from boto3.session import Session
+from config import REGION, CSV_FILE_PATH, GRAPH_FILE_PATH
 
 
 load_dotenv()
 S3_POOL_ID = os.getenv("S3_POOL_ID")
-BUKET_NAME = os.getenv("BUKET_NAME")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
 
 def get_s3():
     client = boto3.client('cognito-identity', REGION)
@@ -32,36 +30,63 @@ def get_s3():
                       aws_session_token=token,
                       region_name=REGION)
     s3 = session.resource('s3')
-    s3.Object("noimu", "test3.wav").upload_file("test/test.wav")
 
+    return s3
 
-
-def plot():
-    # CSVファイルのパス
-    csv_file = "test.csv"
-    s3 = get_s3()
-
+def plot(time):
     try:
-        file = s3.Bucket(BUKET_NAME).download_file(csv_file, csv_file)
-        print("CSVファイルのダウンロードが完了しました。")
-    except:
-        # ファイルが存在しない場合
-        pass
+        s3.Object(BUCKET_NAME, "sleep_data.csv").download_file(CSV_FILE_PATH)
+        print("+ Downloaded csvfile.")
+    except Exception as e:
+        print(f"DOWNLOAD ERROR: {e}")
+
+    # 現在の日付を取得
+    today = datetime.now()
+
+    # 日付を指定した形式の文字列に変換（例：2023-07-24）
+    formatted_date = today.strftime('%Y-%m-%d')
+
+    # サンプルのデータを作成
+    new_data = {
+        'date': [f'{formatted_date}'],
+        'sleep_time': [time]
+    }
+
+    # 新しい日付と睡眠時間をDataFrameに追加
+    new_df = pd.DataFrame(new_data)
+
+    # CSVファイルに保存されているデータを読み込む
+    df = pd.read_csv(CSV_FILE_PATH)
+
+    # 既存のDataFrameに新しいデータを追加
+    df = pd.concat([df, new_df], ignore_index=True)
+
+    # DataFrameをCSVファイルに保存
+    df.to_csv(CSV_FILE_PATH, index=False)
 
     # 日付列と睡眠時間列を取得
-    df = pd.read_csv(file)
-    dates = pd.to_datetime(df['1'])
-    sleep_duration = df['6']
+    df = pd.read_csv(CSV_FILE_PATH)
+    dates = pd.to_datetime(df['date'])
+    sleep_duration = df['sleep_time']
+
+    fontsize = 20
 
     # グラフを描画
-    plt.figure(figsize=(10, 6))
-    plt.plot(dates, sleep_duration, marker='o', linestyle='-')
-    plt.xlabel('date')
-    plt.ylabel('sleep time, hour')
+    plt.figure(figsize=(9, 21))
+    plt.bar(dates, sleep_duration, color='cyan')  # 色を水色に変更
     plt.xticks(rotation=45)
     plt.grid(True)
     plt.tight_layout()
 
+    # 軸ラベルのfontsizeを設定
+    plt.xlabel('date', fontsize=fontsize)  # x軸ラベルのfontsizeを14に設定
+
+    # 軸のfontsizeを設定
+    plt.xticks(fontsize=fontsize)  # x軸のfontsizeを12に設定
+    plt.yticks(fontsize=fontsize)  # y軸のfontsizeを12に設定
+
+    # 凡例の表示と文字サイズの設定
+    plt.legend(['sleep duration'], fontsize=fontsize)  # fontsizeを適宜調整
+
     # グラフをPNGファイルとして出力
-    grapth_file = "graph.png"
-    plt.savefig(grapth_file)
+    plt.savefig(GRAPH_FILE_PATH)

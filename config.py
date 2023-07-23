@@ -31,3 +31,8 @@ REGION = "ap-northeast-1"
 
 # 強化学習に必要なパラメーター
 TYPE_OF_MUSIC = "jpop"
+
+# グラフの設定
+STATIC_ROOT = "static"
+CSV_FILE_PATH = f"{STATIC_ROOT}/sleep_data.csv"
+GRAPH_FILE_PATH = f"{STATIC_ROOT}/graph.png"
