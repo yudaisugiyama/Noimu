@@ -33,7 +33,7 @@ def get_s3():
 
     return s3
 
-def plot(time):
+def plot(s3, sleep_time):
     try:
         s3.Object(BUCKET_NAME, "sleep_data.csv").download_file(CSV_FILE_PATH)
         print("+ Downloaded csvfile.")
@@ -49,7 +49,7 @@ def plot(time):
     # サンプルのデータを作成
     new_data = {
         'date': [f'{formatted_date}'],
-        'sleep_time': [time]
+        'sleep_time': [sleep_time]
     }
 
     # 新しい日付と睡眠時間をDataFrameに追加

@@ -2,14 +2,22 @@
 
 """
 
+import os
+
 from typing import *
 import time
 
 from communication_thread import Communicator
 from config import feedback_queue, open_calm, event_control_queue
 
+from dotenv import load_dotenv
 from utils import get_s3, plot
+from config import CSV_FILE_PATH, GRAPH_FILE_PATH, MUSIC_PATH
 
+
+load_dotenv()
+S3_POOL_ID = os.getenv("S3_POOL_ID")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
 
 def initialize() -> Communicator:
     # 通信用スレッド生成
@@ -25,16 +33,39 @@ def main():
     communicator.start()
     open_calm.start()
 
+    s3 = get_s3()
+    # # 音ファイルアップロード
     # try:
-    #     get_s3()
-    #     print("+ Upload 'grapth.png'.")
+    #     s3.Object(BUCKET_NAME, "music.wav").upload_file(MUSIC_PATH)
+    #     print("+ Uploaded soundfile.")
     # except Exception as e:
-    #     print(f"S3 UPLOAD ERROR: {e}")
+    #     print(f"UPLOAD ERROR: {e}")
 
     while True:
-        key_name, file_name = event_control_queue.get()
-        # 学習終わりとグラフ
-        print(f"+ Upload {key_name} {file_name}.")
+        sleep_time = event_control_queue.get()
+        plot(s3, sleep_time)
+
+        # グラフアップロード
+        try:
+            s3.Object(BUCKET_NAME, "graph.png").upload_file(GRAPH_FILE_PATH)
+            print("+ Uploaded graphfile.")
+        except Exception as e:
+            print(f"UPLOAD ERROR: {e}")
+
+        # CSVアップロード
+        try:
+            s3.Object(BUCKET_NAME, "sleep_data.csv").upload_file(CSV_FILE_PATH)
+            print("+ Uploaded csvfile.")
+        except Exception as e:
+            print(f"UPLOAD ERROR: {e}")
+
+        # 音ファイルアップロード
+        try:
+            s3.Object(BUCKET_NAME, "music.wav").upload_file(MUSIC_PATH)
+            print("+ Uploaded soundfile.")
+        except Exception as e:
+            print(f"UPLOAD ERROR: {e}")
+
         time.sleep(1)
 
 if __name__ == "__main__":

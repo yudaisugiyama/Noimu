@@ -43,7 +43,6 @@ def on_message(client, userdata, msg):
         # メッセージをデコード
         query = msg.payload.decode()
         query_info = json.loads(query)
-        print(query)
 
         # リクエストに応じて処理
         request = query_info['request']
@@ -51,8 +50,17 @@ def on_message(client, userdata, msg):
         if request == 'compute_main_function':
             # キューにフィードバックを入れる
             feedback_queue.put(query_info['feedback']['elapsed_time'])
+            time.sleep(0.1)
+
+
+            '''鈴木くんここらへんどうしよう
+
+            強化学習一瞬だけど、一応終わったら通知ここでほしい
+            # # 学習終わるまで待機
+            # foge = feedback_queue.get()
+            '''
+
             print(query_info['feedback'])
-            print(query_info['feedback']['elapsed_time'])
 
             # ノイミューの言葉を取得してUnityに送信
             noimu_words = opencalm_prompt_queue.get()
@@ -65,23 +73,14 @@ def on_message(client, userdata, msg):
 
             print(noimu_words)
 
-            # 睡眠時間のグラフを作成
-            print('+ Create sleep graph.')
-            try:
-                print(query_info['feedback']['sleep_time'])
-                fig = plot()
-                event_control_queue.put(fig)
-
-            except:
-                key_name, file_name = "test", "test"
-                msg = [key_name, file_name]
-                event_control_queue.put(msg)
+            # グラフ作成イベント
+            event_control_queue.put(query_info['feedback']['sleep_time'])
 
         elif request == 'sound_file':
             print('+ Send sound file info.')
             data = {
                 "request": "sound_file",
-                "value": MUSIC_PATH,
+                "value": "music.wav",
             }
             msg = json.dumps(dict(data), indent=0)
             client.publish(INFO_TOPIC, msg)
