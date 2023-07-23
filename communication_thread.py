@@ -43,14 +43,16 @@ def on_message(client, userdata, msg):
         # メッセージをデコード
         query = msg.payload.decode()
         query_info = json.loads(query)
+        print(query)
 
         # リクエストに応じて処理
         request = query_info['request']
 
         if request == 'compute_main_function':
             # キューにフィードバックを入れる
-            feedback_queue.put(query_info['feedback'])
+            feedback_queue.put(query_info['feedback']['elapsed_time'])
             print(query_info['feedback'])
+            print(query_info['feedback']['elapsed_time'])
 
             # ノイミューの言葉を取得してUnityに送信
             noimu_words = opencalm_prompt_queue.get()
@@ -66,7 +68,7 @@ def on_message(client, userdata, msg):
             # 睡眠時間のグラフを作成
             print('+ Create sleep graph.')
             try:
-                print(query_info['sleep_time'])
+                print(query_info['feedback']['sleep_time'])
                 fig = plot()
                 event_control_queue.put(fig)
 

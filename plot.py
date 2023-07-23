@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 
 from config import REGION
 
-
 load_dotenv()
 S3_POOL_ID = os.getenv("S3_POOL_ID")
 BUKET_NAME = os.getenv("BUKET_NAME")
@@ -32,36 +31,41 @@ def get_s3():
                       aws_session_token=token,
                       region_name=REGION)
     s3 = session.resource('s3')
-    s3.Object("noimu", "test3.wav").upload_file("test/test.wav")
+    # s3.Object("noimu", "test3.wav").upload_file("test/test.wav")
+    object_key = "test.csv"
+    local_file_path = "test.csv"
+
+    s3.Bucket(BUKET_NAME).download_file(object_key, local_file_path)
+
+    return s3
 
 
+# CSVファイルのパス
+object_key = "test.csv"
+local_file_path = "test.csv"
+s3 = get_s3()
 
-def plot():
-    # CSVファイルのパス
-    csv_file = "test.csv"
-    s3 = get_s3()
+try:
+    s3.Bucket(BUKET_NAME).download_file(object_key, local_file_path)
+    # s3.download_file(BUKET_NAME, object_key, local_file_path)
+    print("+ Downloaded csvfile.")
+except:
+    print("DOWNLOAD ERROR.")
 
-    try:
-        file = s3.Bucket(BUKET_NAME).download_file(csv_file, csv_file)
-        print("CSVファイルのダウンロードが完了しました。")
-    except:
-        # ファイルが存在しない場合
-        pass
+# # 日付列と睡眠時間列を取得
+# df = pd.read_csv(csv_file)
+# dates = pd.to_datetime(df['date'])
+# sleep_duration = df['sleep_time']
 
-    # 日付列と睡眠時間列を取得
-    df = pd.read_csv(file)
-    dates = pd.to_datetime(df['1'])
-    sleep_duration = df['6']
+# # グラフを描画
+# plt.figure(figsize=(10, 6))
+# plt.plot(dates, sleep_duration, marker='o', linestyle='-')
+# plt.xlabel('date')
+# plt.ylabel('sleep time, hour')
+# plt.xticks(rotation=45)
+# plt.grid(True)
+# plt.tight_layout()
 
-    # グラフを描画
-    plt.figure(figsize=(10, 6))
-    plt.plot(dates, sleep_duration, marker='o', linestyle='-')
-    plt.xlabel('date')
-    plt.ylabel('sleep time, hour')
-    plt.xticks(rotation=45)
-    plt.grid(True)
-    plt.tight_layout()
-
-    # グラフをPNGファイルとして出力
-    grapth_file = "graph.png"
-    plt.savefig(grapth_file)
+# # グラフをPNGファイルとして出力
+# grapth_file = "graph.png"
+# plt.savefig(grapth_file)
