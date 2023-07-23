@@ -55,10 +55,9 @@ sequenceDiagram
 msg = {
     "request": "compute_main_function",
     "feedback": {
-        "audio_prompt": "jpop",
         "elapsed_time": 999,
+        "sleep_time": 999,
     },
-    "sleep_time": 999,
 }
 
 
@@ -82,6 +81,5 @@ msg = {
 msg = {
     "request": "sound_file",
     "value": "music.wav",
-    "kind": "jpop",
 }
 ```
