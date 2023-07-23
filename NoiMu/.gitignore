@@ -74,3 +74,9 @@ crashlytics-build.properties
 
 # Large files
 NoiMu
+Image
+Materials
+VRM10
+VRMShaders
+*.meta
+UnityChan
