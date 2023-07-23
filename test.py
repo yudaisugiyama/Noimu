@@ -3,9 +3,10 @@
 """
 
 from typing import *
+import time
 
 from communication_thread import Communicator
-from config import feedback_queue, open_calm
+from config import feedback_queue, open_calm, event_control_queue
 
 from utils import get_s3, plot
 
@@ -20,16 +21,21 @@ def initialize() -> Communicator:
 def main():
     communicator = initialize()
 
-    try:
-        get_s3()
-        print("+ Upload 'grapth.png'.")
-    except Exception as e:
-        print(f"S3 UPLOAD ERROR: {e}")
-
     # スレッドの開始
     communicator.start()
     open_calm.start()
 
+    # try:
+    #     get_s3()
+    #     print("+ Upload 'grapth.png'.")
+    # except Exception as e:
+    #     print(f"S3 UPLOAD ERROR: {e}")
+
+    while True:
+        key_name, file_name = event_control_queue.get()
+        # 学習終わりとグラフ
+        print(f"+ Upload {key_name} {file_name}.")
+        time.sleep(1)
 
 if __name__ == "__main__":
     main()
