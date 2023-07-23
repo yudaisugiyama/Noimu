@@ -78,9 +78,10 @@ msg = {
 }
 
 
-## 音ファイルのリクエスト
+## 音ファイルのレスポンス
 msg = {
     "request": "sound_file",
     "value": "music.wav",
+    "kind": "jpop",
 }
 ```

@@ -8,7 +8,7 @@ import threading
 from queue import Queue
 from paho.mqtt import client as mqtt
 
-from config import MUSIC_PATH, CLIENT_ID, HOST, PORT, KEEP_ALIVE, FEEDBACK_TOPIC, INFO_TOPIC, feedback_queue, prompt_queue, event_control_queue, open_calm
+from config import MUSIC_PATH, CLIENT_ID, HOST, PORT, KEEP_ALIVE, FEEDBACK_TOPIC, INFO_TOPIC, feedback_queue, opencalm_prompt_queue, event_control_queue, open_calm
 
 from utils import get_s3, plot
 
@@ -53,7 +53,7 @@ def on_message(client, userdata, msg):
             print(query_info['feedback'])
 
             # ノイミューの言葉を取得してUnityに送信
-            noimu_words = prompt_queue.get()
+            noimu_words = opencalm_prompt_queue.get()
             data = {
                 "request": "noimu_words",
                 "value": noimu_words,

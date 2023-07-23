@@ -8,7 +8,7 @@ from open_calm_thread import OpenCALM
 # Unityに渡す音楽のパス
 MUSIC_PATH = "Test.wav"
 
-# 人間からのフィードバック時間を受け渡すキュー
+# キュー
 feedback_queue = Queue()
 opencalm_prompt_queue = Queue()
 audio_prompt_queue = Queue()
@@ -28,3 +28,6 @@ open_calm = OpenCALM(prompt_queue=opencalm_prompt_queue, location=LOCATION)
 
 # AWSの設定
 REGION = "ap-northeast-1"
+
+# 強化学習に必要なパラメーター
+TYPE_OF_MUSIC = "jpop"
