@@ -53,6 +53,7 @@ def on_message(client, userdata, msg):
 
             # 強化学習 + 音生成の完了待ち
             completion_flag = rl_completion_flag_queue.get()
+            print("+ rl done.")
 
             print(query_info['feedback'])
 

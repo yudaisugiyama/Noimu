@@ -9,7 +9,7 @@ from .cateory_management import CategoryManager
 
 
 class RLModel:
-    def __init__(self, categories=[["delightful", "depressing"], ["jazz", "rock"]], num_hidden=32, replay_buffer_size=1) -> None:
+    def __init__(self, categories=[["delightful", "depressing"], ["jazz", "rock"]], num_hidden=32, replay_buffer_size=1, debug=False) -> None:
         """強化学習モデルの生成
 
         Args:
@@ -17,6 +17,8 @@ class RLModel:
             num_hidden (int): 1層存在する隠れ層のノードの数
             replay_buffer_size (int): リプレイバッファ（バッファ全部使って学習する）のサイズ。ややこしいのでとりあえず1にしてある
         """
+        self.debug = debug
+
         # カテゴリの数を数える
         num_categories = len(categories)
         num_category_contents = [len(category) for category in categories]
@@ -31,13 +33,17 @@ class RLModel:
         # カテゴリ管理クラス
         self.catman = CategoryManager(category_names=categories, category_postfixes=[" ", "."])
 
+        # GPUメモリ削減のため、関数内でMusicGenを逐次生成する
         # 音楽生成モデルの定義
-        self.music_gen: MusicGen = MusicGen.get_pretrained("medium")
-        self.music_gen.set_generation_params(
-            use_sampling=True,
-            top_k=250,
-            duration=2  # 2秒の音楽を生成
-        )
+        # self.music_gen: MusicGen = MusicGen.get_pretrained("medium")
+        # self.music_gen.set_generation_params(
+        #     use_sampling=True,
+        #     top_k=250,
+        #     duration=2  # 2秒の音楽を生成
+        # )
+
+        if debug:
+            print("+ RLModelの初期化が完了しました。")
 
     @property
     def all_prompts(self) -> list[str]:
@@ -115,14 +121,28 @@ class RLModel:
             input_outputs[selected][0]
         )
 
-        if debug:
-            print(f"{prompt} の音楽を選択しました")
+        if debug or self.debug:
+            print(f"+ {prompt} の音楽を選択しました")
+            print("+ MusicGenモデルを生成します。")
+
+        # 音楽生成モデルの生成
+        music_gen: MusicGen = MusicGen.get_pretrained("medium")
+        music_gen.set_generation_params(
+            use_sampling=True,
+            top_k=250,
+            duration=2  # 2秒の音楽を生成
+        )
+        if debug or self.debug:
+            print("+ モデルをロードしました。\n+ 音楽を生成します。")
 
         # テキストから音楽の生成
-        music: torch.Tensor = self.music_gen.generate(
+        music: torch.Tensor = music_gen.generate(
             descriptions=[prompt],
             progress=True
         )
+
+        if debug or self.debug:
+            print("+ 音楽生成が完了しました。")
         assert music.shape[:2] == (1, 1)  # バッチ次元、行列の高さがそれぞれ1であることを確認
         return prompt, music[0]  # バッチ次元を削除
 
@@ -138,7 +158,7 @@ class RLModel:
         sum_exp_values = sum([np.exp(v/tau) for v in values])   # softmax選択の分母の計算
         p = [np.exp(v/tau)/sum_exp_values for v in values]      # 確率分布の生成
 
-        if debug:
+        if debug or self.debug:
             q_values = {prompt : v for prompt, v in zip(self.all_prompts, values)}
             action_probs = {prompt : prob for prompt, prob in zip(self.all_prompts, p)}
 

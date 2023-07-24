@@ -12,17 +12,17 @@ import os
 import threading
 from soundAI.rl_model import RLModel
 from queue import Queue
-from config import TYPE_OF_MUSIC
+import datetime
 
 from audiocraft.data.audio import audio_write
 
 
 class DQN(threading.Thread):
-    def __init__(self, rl_model: RLModel, feedback_queue: Queue, audio_prompt_queue: Queue) -> None:
+    def __init__(self, rl_model: RLModel, feedback_queue: Queue, rl_completion_flag_queue: Queue) -> None:
         super().__init__()
         self.model = rl_model
         self.feedback_queue = feedback_queue
-        self.audio_prompt_queue = audio_prompt_queue
+        self.rl_completion_flag_queue = rl_completion_flag_queue
 
         # 最新の生成プロンプト
         # フィードバックが返ってきたらこの値のフィードバックと認識する
@@ -33,6 +33,12 @@ class DQN(threading.Thread):
         print("DQNクラスの初期化が完了しました。")
         print("学習前の最初の音楽生成プロンプトは以下のように認識しています。")
         print("\t" + self.latest_prompt)
+
+        # ログ設定
+        dt_now = datetime.datetime.now().isoformat()
+        self.log_dir = "./log/log_dqn"
+        self.log_filename = os.path.join(self.log_dir, dt_now[:19] + ".txt")
+        self.audio_id = 0
 
     def run(self) -> None:
         while True:
@@ -50,7 +56,20 @@ class DQN(threading.Thread):
             self.latest_prompt = prompt
 
             # wavを指定のパスに保存
-            audio_write(os.path.splitext(MUSIC_PATH)[0], wav.cpu(), self.model.music_gen.sample_rate, strategy="loudness")
+            audio_write(os.path.splitext(MUSIC_PATH)[0], wav.cpu(), 32000, strategy="loudness")
+
+            # ログとっとく
+            self._log(prompt, wav)
 
             # キューにプロンプトを送信する
-            self.audio_prompt_queue.put(prompt)
+            self.rl_completion_flag_queue.put(True)
+
+    def _log(self, prompt, wav) -> None:
+        """ログの保存"""
+        now = datetime.datetime.now().isoformat()
+        with open(self.log_filename, "a") as f:
+            f.write(f"{prompt} {now}")
+
+        audio_name = prompt + "_" + now
+        audio_path = os.path.join(self.log_dir, audio_name)
+        audio_write(audio_path, wav.cpu(), 32000, strategy="loudness")
