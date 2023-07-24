@@ -6,6 +6,7 @@ import os
 import time
 import torch
 import requests
+from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import threading
@@ -20,22 +21,21 @@ class OpenCALM(threading.Thread):
         self.model = AutoModelForCausalLM.from_pretrained(self.model_name).to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained("cyberagent/open-calm-small")
 
-        # 天気API使用
-        # load_dotenv()
-        # self.api_key = os.getenv("API_TOKEN_OPEN_WEATHER_MAP")
         self.prompt_queue = prompt_queue
         self.location = location
-        # self.lat, self.lon = self.get_location_info()
-        # self.url = \
-        # f"https://api.openweathermap.org/data/2.5/weather?lat={self.lat}&lon={self.lon}&appid={self.api_key}&lang=ja"
-        # self.response = requests.get(self.url)
+
+        # 天気情報取得
+        # self.get_weather()
+
 
     def run(self):
+        # 天気情報取得
         # self.response = self.response.json()
         # self.weather = self.response['weather'][0]['description']
 
         while True:
-            prompt = f"おはよ〜！今日の長岡技術科学大学の空は厚い雲だから、"
+            prompt = f"おはよ〜！今日の{self.location}の空は晴れだから、"
+            # prompt = f"おはよ〜！今日の{self.location}の空は{self.weather}だから、"
 
             inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
             with torch.no_grad():
@@ -65,3 +65,12 @@ class OpenCALM(threading.Thread):
         lon = location.longitude
 
         return str(lat), str(lon)
+    
+    def get_weather(self) -> str:
+        # 天気API使用
+        load_dotenv()
+        self.api_key = os.getenv("API_TOKEN_OPEN_WEATHER_MAP")
+        self.lat, self.lon = self.get_location_info()
+        self.url = \
+        f"https://api.openweathermap.org/data/2.5/weather?lat={self.lat}&lon={self.lon}&appid={self.api_key}&lang=ja"
+        self.response = requests.get(self.url)
