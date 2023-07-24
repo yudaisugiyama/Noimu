@@ -25,7 +25,7 @@ class DQN(threading.Thread):
 
         # 最新の生成プロンプト
         # フィードバックが返ってきたらこの値のフィードバックと認識する
-        #
+        # 最初の音楽の決定次第ここの値も変更する
         self.latest_prompt = self.model.catman.combination_tensor_to_text(
             self.model.network.generate_all_input_combinations()[0]
         )
