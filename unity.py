@@ -7,8 +7,8 @@ import paho.mqtt.client as mqtt
 
 
 def main():
-    # host = "192.168.10.101"
-    host = "localhost"
+    host = "192.168.10.101"
+    # host = "localhost"
     topic = "feedback"
 
     client = mqtt.Client("unity")
