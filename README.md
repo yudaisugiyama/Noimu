@@ -115,6 +115,3 @@ git push origin HEAD:dev
 ```
 git merge main
 ```
-
-```
-```
