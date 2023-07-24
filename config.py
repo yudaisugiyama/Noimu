@@ -15,12 +15,13 @@ MUSIC_PATH = f"{STATIC_ROOT}/music.wav"
 # キュー
 feedback_queue = Queue()
 opencalm_prompt_queue = Queue()
-audio_prompt_queue = Queue()
+rl_completion_flag_queue = Queue()
 event_control_queue = Queue()
 
 # MQTTの設定
 CLIENT_ID = "noimu"
-HOST = "192.168.10.101"
+# HOST = "192.168.10.101"
+HOST = "localhost"
 PORT = 1883
 KEEP_ALIVE = 60
 FEEDBACK_TOPIC = "feedback"
@@ -32,6 +33,3 @@ open_calm = OpenCALM(prompt_queue=opencalm_prompt_queue, location=LOCATION)
 
 # AWSの設定
 REGION = "ap-northeast-1"
-
-# 強化学習に必要なパラメーター
-TYPE_OF_MUSIC = "jpop"

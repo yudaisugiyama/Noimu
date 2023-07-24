@@ -8,7 +8,7 @@ from typing import *
 import time
 
 from communication_thread import Communicator
-from config import feedback_queue, open_calm, event_control_queue
+from config import feedback_queue, open_calm, event_control_queue, rl_completion_flag_queue
 
 from dotenv import load_dotenv
 from utils import get_s3, plot
@@ -40,6 +40,10 @@ def main():
     #     print("+ Uploaded soundfile.")
     # except Exception as e:
     #     print(f"UPLOAD ERROR: {e}")
+
+    # 強化学習スレッドが送信する予定の完了フラグを事前に入れておく
+    for _ in range(5):
+        rl_completion_flag_queue.put(1)
 
     while True:
         sleep_time = event_control_queue.get()

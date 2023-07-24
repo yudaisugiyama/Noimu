@@ -47,7 +47,6 @@ class DQN(threading.Thread):
             # wavをモデルから受け取る
             prompt, wav = self.model.choose_music()
             self.latest_prompt = prompt
-            TYPE_OF_MUSIC = prompt
 
             # wavを指定のパスに保存
             audio_write(MUSIC_PATH, wav.cpu(), self.model.music_gen.sample_rate, strategy="loudness", loudness_compressor=True)

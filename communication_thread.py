@@ -8,7 +8,7 @@ import threading
 from queue import Queue
 from paho.mqtt import client as mqtt
 
-from config import MUSIC_PATH, CLIENT_ID, HOST, PORT, KEEP_ALIVE, FEEDBACK_TOPIC, INFO_TOPIC, feedback_queue, opencalm_prompt_queue, event_control_queue, open_calm
+from config import MUSIC_PATH, CLIENT_ID, HOST, PORT, KEEP_ALIVE, FEEDBACK_TOPIC, INFO_TOPIC, feedback_queue, opencalm_prompt_queue, event_control_queue, rl_completion_flag_queue, open_calm
 
 from utils import get_s3, plot
 
@@ -50,15 +50,9 @@ def on_message(client, userdata, msg):
         if request == 'compute_main_function':
             # キューにフィードバックを入れる
             feedback_queue.put(query_info['feedback']['elapsed_time'])
-            time.sleep(0.1)
 
-
-            '''鈴木くんここらへんどうしよう
-
-            強化学習一瞬だけど、一応終わったら通知ここでほしい
-            # # 学習終わるまで待機
-            # foge = feedback_queue.get()
-            '''
+            # 強化学習 + 音生成の完了待ち
+            completion_flag = rl_completion_flag_queue.get()
 
             print(query_info['feedback'])
 
