@@ -84,7 +84,7 @@ msg = {
 }
 ```
 
-### OpenCALMのLoRMファインチューニング
+### OpenCALMのLoRAファインチューニング
 
 参考:
 https://note.com/npaka/n/na5b8e6f749ce
