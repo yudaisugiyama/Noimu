@@ -36,7 +36,7 @@ def get_s3():
 def plot(s3, sleep_time):
     try:
         s3.Object(BUCKET_NAME, "sleep_data.csv").download_file(CSV_FILE_PATH)
-        print("+ Downloaded csvfile.")
+        print("+ [2] Downloaded csvfile.")
     except Exception as e:
         print(f"DOWNLOAD ERROR: {e}")
 

@@ -48,21 +48,21 @@ def main():
         # グラフアップロード
         try:
             s3.Object(BUCKET_NAME, "graph.png").upload_file(GRAPH_FILE_PATH)
-            print("+ Uploaded graphfile.")
+            print("+ [3] Uploaded graphfile.")
         except Exception as e:
             print(f"UPLOAD ERROR: {e}")
 
         # CSVアップロード
         try:
             s3.Object(BUCKET_NAME, "sleep_data.csv").upload_file(CSV_FILE_PATH)
-            print("+ Uploaded csvfile.")
+            print("+ [4] Uploaded csvfile.")
         except Exception as e:
             print(f"UPLOAD ERROR: {e}")
 
         # 音ファイルアップロード
         try:
             s3.Object(BUCKET_NAME, "music.wav").upload_file(MUSIC_PATH)
-            print("+ Uploaded soundfile.")
+            print("+ [5] Uploaded soundfile.")
         except Exception as e:
             print(f"UPLOAD ERROR: {e}")
 

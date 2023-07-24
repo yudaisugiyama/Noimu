@@ -38,7 +38,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     if msg.topic == FEEDBACK_TOPIC:
-        print('+ Received message.')
+        print('+ [1] Received message.')
 
         # メッセージをデコード
         query = msg.payload.decode()
@@ -77,11 +77,11 @@ def on_message(client, userdata, msg):
             event_control_queue.put(query_info['feedback']['sleep_time'])
 
         elif request == 'sound_file':
-            print('+ Send sound file info.')
+            print('+ [1] Received message.')
             data = {
                 "request": "sound_file",
                 "value": "music.wav",
             }
             msg = json.dumps(dict(data), indent=0)
             client.publish(INFO_TOPIC, msg)
-            print("+ Publish sound file info.")
+            print("+ [2] Publish sound file info.")
