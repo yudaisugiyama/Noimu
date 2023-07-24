@@ -1,6 +1,7 @@
 from collections import deque
 import torch
 import numpy as np
+from audiocraft.models import MusicGen
 
 from .net import ShallowQNetwork
 from .cateory_management import CategoryManager
@@ -22,37 +23,54 @@ class RLModel:
         self.network = ShallowQNetwork(num_categories=num_categories, num_category_contents=num_category_contents, num_hidden=num_hidden)  # DQN風ネットワーク
         self.latest_actions = deque(maxlen=5)  # 直近の行動を記録
         self.latest_feedbacks = deque(maxlen=5)  # 直近のフィードバック（報酬）を記録
+        self.optimizer = torch.optim.Adam(self.network.parameters(), lr=0.2)
+        self.loss_function = torch.nn.L1Loss()  # 誤差の絶対値
 
         # カテゴリ管理クラス
         self.catman = CategoryManager(category_names=categories, category_postfixes=[" ", "."])
 
-    def add_feedback(self, feedback: dict) -> None:
+        # 音楽生成モデルの定義
+        self.music_gen: MusicGen = MusicGen.get_pretrained("medium")
+        self.music_gen.set_generation_params(
+            use_sampling=True,
+            top_k=250,
+            duration=2  # 2秒の音楽を生成
+        )
+
+    def add_latest_prompt(self, prompt: str):
+        """学習に使う、ユーザーからのフィードバックに対応する音楽のプロンプトを記録する
+
+        Args:
+            prompt (str): 音楽生成プロンプト
+        """
+        # プロンプトを行動idと対応させて記録する
+        action_id = self.catman.prompt_to_action_id(prompt, self.network)
+        self.latest_actions.append(action_id)
+
+    def add_feedback(self, feedback: float) -> None:
         """学習に使う、ユーザーからのフィードバックを記録する
 
         Args:
-            feedback (dict): MQQTで受け取った辞書
-                以下は何となく
-                "prompt_text": ユーザーに送信した音楽の生成に使ったプロンプト
-                "elapsed_time": 起きるまでにかかった時間
+            feedback (float): MQQTで受け取った起床までにかかった時間
         """
-        # プロンプトを行動idと対応させて記録する
-        action_id = self.catman.prompt_to_action_id(feedback["prompt_text"], self.network)
-        self.latest_actions.append(action_id)
-
         # フィードバックを記録する
-        self.latest_feedbacks.append(feedback["elapsed_time"])
+        self.latest_feedbacks.append(feedback)
 
     def learn(self) -> None:
         """add_feedback()によって追加された経験を利用して学習を行う
         """
-        assert len(self.latest_actions) == self.replay_buffer, f"num of actions != num replay buffer items. {len(self.latest_actions)} != {len(self.replay_buffer)}." \
-                                                               f"最初の行動がlatest_actionsに入っていない可能性があります"
+        assert len(self.latest_actions) == len(self.latest_feedbacks), f"num of actions != num replay buffer items. {len(self.latest_actions)} != {len(self.latest_feedbacks)}."
 
-        input_outputs = self.rl_network.calc_all_qvalues()
+        input_outputs = self.network.calc_all_qvalues()
         outputs, targets = [], []
-        for music, elapsed_time in zip(self.latest_actions, self.replay_buffer):
+        for music, elapsed_time in zip(self.latest_actions, self.latest_feedbacks):
             outputs.append(input_outputs[music][1])
             targets.append(elapsed_time)
+        outputs = torch.stack(outputs)
+        targets = torch.tensor([targets]).T  # 転置するとちょうどよさそう？
+
+        print("outputs", outputs)
+        print("targets", targets)
 
         self.optimizer.zero_grad()
         loss = self.loss_function(outputs, targets)
@@ -70,9 +88,9 @@ class RLModel:
         # Softmax(-(Q - 30))で選択する
         # 30秒を基準にしているので、0周辺にリスケールし、
         # 値が小さい方が価値が高いのでマイナスをかける
-        input_outputs = self.rl_network.calc_all_qvalues()
-        outputs = [-(i_o[1] - 30) for i_o in input_outputs]
-        selected = self._softmax(outputs, 1.0, debug)
+        input_outputs = self.network.calc_all_qvalues()
+        outputs = [-(i_o[1] - 30).item() for i_o in input_outputs]
+        selected = self._softmax(outputs, 0.5, debug)
 
         # 入力プロンプトの生成
         prompt = self.catman.combination_tensor_to_text(
@@ -103,7 +121,9 @@ class RLModel:
         p = [np.exp(v/tau)/sum_exp_values for v in values]      # 確率分布の生成
 
         if debug:
-            print("ソフトマックス行動選択の確立は以下のようになりました。")
+            print("各行動のQ値は以下のようになります。")
+            print(values)
+            print(f"ソフトマックス行動選択(t={tau})の確率は以下のようになりました。")
             print(p)
 
         action = np.random.choice(np.arange(len(values)), p=p)  # 確率分布pに従ってランダムで選択
