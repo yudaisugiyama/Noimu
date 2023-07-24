@@ -74,6 +74,26 @@ class OpenCALM(threading.Thread):
         outputs = outputs[0].tolist()
         print(self.tokenizer.decode(outputs))
 
+    # プロンプトテンプレートの準備
+    def generate_prompt(data_point):
+        if data_point["input"]:
+            return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+    ### Instruction:
+    {data_point["instruction"]}
+
+    ### Input:
+    {data_point["input"]}
+
+    ### Response:"""
+        else:
+            return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+    ### Instruction:
+    {data_point["instruction"]}
+
+    ### Response:"""
+
 
     def run(self):
         # 天気情報取得

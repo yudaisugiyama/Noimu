@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+lora-calm-small/adapter_model.bin
+
 # C extensions
 *.so
 
