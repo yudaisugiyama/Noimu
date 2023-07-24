@@ -35,8 +35,6 @@ sequenceDiagram
 
     Unity->>+Unity: アラームを設定
     activate Unity
-    Unity->>+Python: 音ファイルのリクエスト(sound_file)
-    Python-->-Unity: {"value": "music.wav"}
     activate Python
     Unity->>+S3: music.wavのダウンロードリクエスト
     S3-->>-Unity: music.wav
@@ -61,26 +59,12 @@ msg = {
 }
 
 
-## 音ファイルのリクエスト
-msg = {
-    "request": "sound_file",
-}
-
-
-
 # Python => Unity
 
 ## ノイミューの言葉の送信
 msg = {
     "request": "noimu_words",
     "value": "おはよ〜、今日の睡眠時間はxx時間で、・・・",
-}
-
-
-## 音ファイルのレスポンス
-msg = {
-    "request": "sound_file",
-    "value": "music.wav",
 }
 ```
 
