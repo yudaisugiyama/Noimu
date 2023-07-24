@@ -1,4 +1,4 @@
-"""Unityの挙動をPythonで再現する
+"""Unity通信のスタブ
 """
 
 import time
@@ -7,8 +7,8 @@ import paho.mqtt.client as mqtt
 
 
 def main():
-    # host = "192.168.10.101"
-    host = "localhost"
+    host = "192.168.10.101"
+    # host = "localhost"
     topic = "feedback"
 
     client = mqtt.Client("unity")
@@ -19,7 +19,7 @@ def main():
 
 
     ## フィードバックの送信
-    msg1 = {
+    data = {
         "request": "compute_main_function",
         "feedback": {
             "elapsed_time": 999,
@@ -27,20 +27,12 @@ def main():
         },
     }
 
-    ## 音ファイルのリクエスト
-    msg2 = {
-        "request": "sound_file",
-    }
-
-
-    data = [msg1, msg2]
-
-    for i in range(2):
-        msg = json.dumps(dict(data[i]), indent=0)
+    while True:
+        msg = json.dumps(dict(data), indent=0)
         info = client.publish(topic, msg, qos=1)
         if info[0] != 0:
             print("PUBLISH FAILED")
-        time.sleep(6)
+        time.sleep(10)
 
 
 def on_connect(client, userdata, flags, rc):

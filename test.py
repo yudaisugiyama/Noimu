@@ -34,12 +34,6 @@ def main():
     open_calm.start()
 
     s3 = get_s3()
-    # # 音ファイルアップロード
-    # try:
-    #     s3.Object(BUCKET_NAME, "music.wav").upload_file(MUSIC_PATH)
-    #     print("+ Uploaded soundfile.")
-    # except Exception as e:
-    #     print(f"UPLOAD ERROR: {e}")
 
     # 強化学習スレッドが送信する予定の完了フラグを事前に入れておく
     for _ in range(5):
@@ -52,21 +46,21 @@ def main():
         # グラフアップロード
         try:
             s3.Object(BUCKET_NAME, "graph.png").upload_file(GRAPH_FILE_PATH)
-            print("+ [3] Uploaded graphfile.")
+            print("+ [4] Uploaded graphfile.")
         except Exception as e:
             print(f"UPLOAD ERROR: {e}")
 
         # CSVアップロード
         try:
             s3.Object(BUCKET_NAME, "sleep_data.csv").upload_file(CSV_FILE_PATH)
-            print("+ [4] Uploaded csvfile.")
+            print("+ [5] Uploaded csvfile.")
         except Exception as e:
             print(f"UPLOAD ERROR: {e}")
 
         # 音ファイルアップロード
         try:
             s3.Object(BUCKET_NAME, "music.wav").upload_file(MUSIC_PATH)
-            print("+ [5] Uploaded soundfile.")
+            print("+ [6] Uploaded soundfile.")
         except Exception as e:
             print(f"UPLOAD ERROR: {e}")
 
