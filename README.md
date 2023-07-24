@@ -102,7 +102,7 @@ git branch -a
   remotes/origin/main
 
 ```
-git checkout remotes/origin/dev 
+git checkout remotes/origin/dev
 ```
 
 ```
