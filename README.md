@@ -88,3 +88,5 @@ msg = {
 
 参考:
 https://note.com/npaka/n/na5b8e6f749ce
+
+データセット: @kun1em0nさんの[「kunishou/databricks-dolly-15k-ja」](https://github.com/kunishou/databricks-dolly-15k-ja)
