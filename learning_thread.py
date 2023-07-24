@@ -8,6 +8,7 @@
 """
 
 from config import MUSIC_PATH
+import os
 import threading
 from soundAI.rl_model import RLModel
 from queue import Queue
@@ -49,7 +50,7 @@ class DQN(threading.Thread):
             self.latest_prompt = prompt
 
             # wavを指定のパスに保存
-            audio_write(MUSIC_PATH, wav.cpu(), self.model.music_gen.sample_rate, strategy="loudness", loudness_compressor=True)
+            audio_write(os.path.splitext(MUSIC_PATH)[0], wav.cpu(), self.model.music_gen.sample_rate, strategy="loudness")
 
             # キューにプロンプトを送信する
             self.audio_prompt_queue.put(prompt)

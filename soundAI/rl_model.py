@@ -2,18 +2,20 @@ from collections import deque
 import torch
 import numpy as np
 from audiocraft.models import MusicGen
+import pprint
 
 from .net import ShallowQNetwork
 from .cateory_management import CategoryManager
 
 
 class RLModel:
-    def __init__(self, categories=[["delightful", "depressing"], ["jazz", "rock"]], num_hidden=32) -> None:
+    def __init__(self, categories=[["delightful", "depressing"], ["jazz", "rock"]], num_hidden=32, replay_buffer_size=1) -> None:
         """強化学習モデルの生成
 
         Args:
             categories (list[str]): カテゴリのリスト
-            num_hidden (_type_): 1層存在する隠れ層のノードの数
+            num_hidden (int): 1層存在する隠れ層のノードの数
+            replay_buffer_size (int): リプレイバッファ（バッファ全部使って学習する）のサイズ。ややこしいのでとりあえず1にしてある
         """
         # カテゴリの数を数える
         num_categories = len(categories)
@@ -21,8 +23,8 @@ class RLModel:
 
         # ネットワーク定義
         self.network = ShallowQNetwork(num_categories=num_categories, num_category_contents=num_category_contents, num_hidden=num_hidden)  # DQN風ネットワーク
-        self.latest_actions = deque(maxlen=5)  # 直近の行動を記録
-        self.latest_feedbacks = deque(maxlen=5)  # 直近のフィードバック（報酬）を記録
+        self.latest_actions = deque(maxlen=replay_buffer_size)  # 直近の行動を記録
+        self.latest_feedbacks = deque(maxlen=replay_buffer_size)  # 直近のフィードバック（報酬）を記録
         self.optimizer = torch.optim.Adam(self.network.parameters(), lr=0.2)
         self.loss_function = torch.nn.L1Loss()  # 誤差の絶対値
 
@@ -37,12 +39,28 @@ class RLModel:
             duration=2  # 2秒の音楽を生成
         )
 
+    @property
+    def all_prompts(self) -> list[str]:
+        """全プロンプトを行動ID順に並べたリストを返す
+
+        Returns:
+            list[str]: プロンプトリスト
+        """
+        all_input_tensors = self.network.generate_all_input_combinations(debug=False)
+        prompts = [
+            self.catman.combination_tensor_to_text(input_tensor)
+            for input_tensor in all_input_tensors
+        ]
+        return prompts
+
     def add_latest_prompt(self, prompt: str):
         """学習に使う、ユーザーからのフィードバックに対応する音楽のプロンプトを記録する
 
         Args:
             prompt (str): 音楽生成プロンプト
         """
+        if not prompt in self.all_prompts:
+            raise ValueError(prompt)
         # プロンプトを行動idと対応させて記録する
         action_id = self.catman.prompt_to_action_id(prompt, self.network)
         self.latest_actions.append(action_id)
@@ -121,10 +139,13 @@ class RLModel:
         p = [np.exp(v/tau)/sum_exp_values for v in values]      # 確率分布の生成
 
         if debug:
+            q_values = {prompt : v for prompt, v in zip(self.all_prompts, values)}
+            action_probs = {prompt : prob for prompt, prob in zip(self.all_prompts, p)}
+
             print("各行動のQ値は以下のようになります。")
-            print(values)
+            pprint.pprint(q_values, width=1)
             print(f"ソフトマックス行動選択(t={tau})の確率は以下のようになりました。")
-            print(p)
+            pprint.pprint(action_probs, width=1)
 
         action = np.random.choice(np.arange(len(values)), p=p)  # 確率分布pに従ってランダムで選択
 
