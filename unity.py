@@ -7,8 +7,8 @@ import paho.mqtt.client as mqtt
 
 
 def main():
-    # host = "192.168.10.101"
-    host = "localhost"
+    host = "192.168.10.101"
+    # host = "localhost"
     topic = "feedback"
 
     client = mqtt.Client("unity")
@@ -22,8 +22,8 @@ def main():
     msg1 = {
         "request": "compute_main_function",
         "feedback": {
-            "elapsed_time": 999,
-            "sleep_time": 999,
+            "elapsed_time": 20,
+            "sleep_time": 7,
         },
     }
 

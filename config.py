@@ -20,8 +20,8 @@ event_control_queue = Queue()
 
 # MQTTの設定
 CLIENT_ID = "noimu"
-# HOST = "192.168.10.101"
-HOST = "localhost"
+HOST = "192.168.10.101"
+# HOST = "localhost"
 PORT = 1883
 KEEP_ALIVE = 60
 FEEDBACK_TOPIC = "feedback"
