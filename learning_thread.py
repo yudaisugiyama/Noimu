@@ -18,11 +18,12 @@ from audiocraft.data.audio import audio_write
 
 
 class DQN(threading.Thread):
-    def __init__(self, rl_model: RLModel, feedback_queue: Queue, rl_completion_flag_queue: Queue) -> None:
+    def __init__(self, rl_model: RLModel, feedback_queue: Queue, rl_completion_flag_queue: Queue, duration=2) -> None:
         super().__init__()
         self.model = rl_model
         self.feedback_queue = feedback_queue
         self.rl_completion_flag_queue = rl_completion_flag_queue
+        self.duration = duration
 
         # 最新の生成プロンプト
         # フィードバックが返ってきたらこの値のフィードバックと認識する
@@ -52,7 +53,7 @@ class DQN(threading.Thread):
             self.model.learn()
 
             # wavをモデルから受け取る
-            prompt, wav = self.model.choose_music()
+            prompt, wav = self.model.choose_music(self.duration)
             self.latest_prompt = prompt
 
             # wavを指定のパスに保存

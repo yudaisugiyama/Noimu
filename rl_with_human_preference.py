@@ -31,7 +31,7 @@ def initialize() -> Tuple[DQN, Communicator]:
 
     # 強化学習モデルとスレッド生成
     model = RLModel([["delightful", "calm", "depressing"], ["jazz", "rock"]], num_hidden=32, replay_buffer_size=1, debug=True)  # モデル生成
-    dqn = DQN(model, feedback_queue, rl_completion_flag_queue)  # スレッド生成
+    dqn = DQN(model, feedback_queue, rl_completion_flag_queue, duration=20)  # スレッド生成
 
     # 通信用スレッド生成
     communicator = Communicator()  # Unityとの通信機

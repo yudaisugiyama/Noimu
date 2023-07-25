@@ -101,9 +101,11 @@ class RLModel:
         loss.backward()
         self.optimizer.step()
 
-    def choose_music(self, debug=False) -> tuple[str, torch.Tensor]:
+    def choose_music(self, duration=2, debug=False) -> tuple[str, torch.Tensor]:
         """現在のQ値から音楽をソフトマックス行動選択する
 
+        Args:
+            duration (int): 生成する音楽の秒数
 
         Returns:
             tuple[str, torch.Tensor]: 送信するプロンプトと、それによって生成した音楽
@@ -130,7 +132,7 @@ class RLModel:
         music_gen.set_generation_params(
             use_sampling=True,
             top_k=250,
-            duration=2  # 2秒の音楽を生成
+            duration=duration
         )
         if debug or self.debug:
             print("+ モデルをロードしました。\n+ 音楽を生成します。")
