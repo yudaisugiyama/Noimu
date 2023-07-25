@@ -10,11 +10,17 @@ output_dir = "lora-calm-small-results"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# モデルの準備
+# # モデルの準備
+# model = AutoModelForCausalLM.from_pretrained(
+#     model_name,
+#     load_in_8bit=True,
+#     device_map="auto",
+# )
+
 model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    load_in_8bit=True,
-    device_map="auto",
+    '''ミヤケイさんのコードに修正
+    '''
+    "cyberagent/open-calm-small", device_map="auto", torch_dtype=torch.float32
 )
 
 # トークンナイザーの準備
