@@ -1,4 +1,5 @@
 from collections import deque
+import time
 import torch
 import numpy as np
 from audiocraft.models import MusicGen
@@ -128,7 +129,7 @@ class RLModel:
             print("+ MusicGenモデルを生成します。")
 
         # 音楽生成モデルの生成
-        music_gen: MusicGen = MusicGen.get_pretrained("medium")
+        music_gen: MusicGen = MusicGen.get_pretrained("small")  # TODO: モデルサイズの考察
         music_gen.set_generation_params(
             use_sampling=True,
             top_k=250,
@@ -138,6 +139,7 @@ class RLModel:
             print("+ モデルをロードしました。\n+ 音楽を生成します。")
 
         # テキストから音楽の生成
+        start = time.perf_counter()
         music: torch.Tensor = music_gen.generate(
             descriptions=[prompt],
             progress=True
@@ -145,6 +147,7 @@ class RLModel:
 
         if debug or self.debug:
             print("+ 音楽生成が完了しました。")
+            print(f"+ かかった時間は{time.perf_counter() - start}秒です。")
         assert music.shape[:2] == (1, 1)  # バッチ次元、行列の高さがそれぞれ1であることを確認
         return prompt, music[0]  # バッチ次元を削除
 
