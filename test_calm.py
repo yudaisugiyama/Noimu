@@ -4,22 +4,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # 基本パラメータ
 model_name = "cyberagent/open-calm-small"
-dataset = "kunishou/databricks-dolly-15k-ja"
 peft_name = "lora-calm-small"
-output_dir = "lora-calm-small-results"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# # モデルの準備
-# model = AutoModelForCausalLM.from_pretrained(
-#     model_name,
-#     load_in_8bit=True,
-#     device_map="auto",
-# )
-
 model = AutoModelForCausalLM.from_pretrained(
-    '''ミヤケイさんのコードに修正
-    '''
     "cyberagent/open-calm-small", device_map="auto", torch_dtype=torch.float32
 )
 
@@ -35,27 +23,6 @@ model = PeftModel.from_pretrained(
 
 # 評価モード
 model.eval()
-
-# プロンプトテンプレートの準備
-def generate_prompt(data_point):
-    if data_point["input"]:
-        return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
-
-### Instruction:
-{data_point["instruction"]}
-
-### Input:
-{data_point["input"]}
-
-### Response:"""
-    else:
-        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{data_point["instruction"]}
-
-### Response:"""
-
 
 # テキスト生成関数の定義
 def generate(prompt, maxTokens=128):
