@@ -10,7 +10,7 @@ from .cateory_management import CategoryManager
 
 
 class RLModel:
-    def __init__(self, categories=[["delightful", "depressing"], ["jazz", "rock"]], num_hidden=32, replay_buffer_size=1, debug=False) -> None:
+    def __init__(self, categories=[["delightful", "depressing"], ["jazz", "rock"]], num_hidden=32, replay_buffer_size=1, learning_rate=0.1, debug=False) -> None:
         """強化学習モデルの生成
 
         Args:
@@ -28,7 +28,7 @@ class RLModel:
         self.network = ShallowQNetwork(num_categories=num_categories, num_category_contents=num_category_contents, num_hidden=num_hidden)  # DQN風ネットワーク
         self.latest_actions = deque(maxlen=replay_buffer_size)  # 直近の行動を記録
         self.latest_feedbacks = deque(maxlen=replay_buffer_size)  # 直近のフィードバック（報酬）を記録
-        self.optimizer = torch.optim.Adam(self.network.parameters(), lr=0.2)
+        self.optimizer = torch.optim.Adam(self.network.parameters(), lr=learning_rate)
         self.loss_function = torch.nn.L1Loss()  # 誤差の絶対値
 
         # カテゴリ管理クラス
@@ -99,7 +99,7 @@ class RLModel:
         loss.backward()
         self.optimizer.step()
 
-    def choose_music(self, duration=2, debug=False) -> tuple[str, torch.Tensor]:
+    def choose_music(self, duration=2, tau=0.5, debug=False) -> tuple[str, torch.Tensor]:
         """現在のQ値から音楽をソフトマックス行動選択する
 
         Args:
@@ -114,7 +114,7 @@ class RLModel:
         # 値が小さい方が価値が高いのでマイナスをかける
         input_outputs = self.network.calc_all_qvalues()
         outputs = [-(i_o[1] - 30).item() for i_o in input_outputs]
-        selected = self._softmax(outputs, 0.5, debug)
+        selected = self._softmax(outputs, tau, debug)
 
         # 入力プロンプトの生成
         prompt = self.catman.combination_tensor_to_text(
