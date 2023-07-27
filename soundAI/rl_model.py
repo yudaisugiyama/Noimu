@@ -90,8 +90,9 @@ class RLModel:
         outputs = torch.stack(outputs)
         targets = torch.tensor([targets]).T  # 転置するとちょうどよさそう？
 
-        print("outputs", outputs)
-        print("targets", targets)
+        if self.debug:
+            print("outputs", outputs)
+            print("targets", targets)
 
         self.optimizer.zero_grad()
         loss = self.loss_function(outputs, targets)
