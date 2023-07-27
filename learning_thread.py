@@ -28,11 +28,9 @@ class DQN(threading.Thread):
         # 最新の生成プロンプト
         # フィードバックが返ってきたらこの値のフィードバックと認識する
         # 最初の音楽の決定次第ここの値も変更する
-        self.latest_prompt = self.model.catman.combination_tensor_to_text(
-            self.model.network.generate_all_input_combinations()[0]
-        )
+        self.latest_prompt = "calm EDM."
         print("DQNクラスの初期化が完了しました。")
-        print("学習前の最初の音楽生成プロンプトは以下のように認識しています。")
+        print("最初の音楽生成プロンプトは以下の通りです。")
         print("\t" + self.latest_prompt)
 
         # ログ設定
