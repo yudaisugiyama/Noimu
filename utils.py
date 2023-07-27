@@ -72,9 +72,9 @@ def plot(s3, sleep_time):
     fontsize = 20
 
     # グラフを描画
-    plt.figure(figsize=(7, 10))
+    plt.figure(figsize=(7, 10.5))  # (7, 10) -> (7, 10.5)
     plt.bar(dates, sleep_duration, color='cyan')  # 色を水色に変更
-    plt.xticks(rotation=20)
+    plt.xticks(rotation=30)
     plt.grid(True)
     plt.tight_layout()
 
@@ -89,4 +89,5 @@ def plot(s3, sleep_time):
     plt.legend(['sleep duration'], fontsize=fontsize)  # fontsizeを適宜調整
 
     # グラフをPNGファイルとして出力
+    plt.subplots_adjust(bottom=0.15)  # bottom: 0.1 -> 0.15
     plt.savefig(GRAPH_FILE_PATH)

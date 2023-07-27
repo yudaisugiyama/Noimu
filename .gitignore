@@ -237,3 +237,6 @@ crashlytics-build.properties
 
 # Large files
 /[Aa]ssets/NoiMu/*
+
+# wav
+log/log_dqn/*.wav
