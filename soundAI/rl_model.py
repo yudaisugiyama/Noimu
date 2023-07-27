@@ -35,13 +35,9 @@ class RLModel:
         self.catman = CategoryManager(category_names=categories, category_postfixes=[" ", "."])
 
         # GPUメモリ削減のため、関数内でMusicGenを逐次生成する
+        # ↑一旦ここで生成してみる
         # 音楽生成モデルの定義
-        # self.music_gen: MusicGen = MusicGen.get_pretrained("medium")
-        # self.music_gen.set_generation_params(
-        #     use_sampling=True,
-        #     top_k=250,
-        #     duration=2  # 2秒の音楽を生成
-        # )
+        self.music_gen: MusicGen = MusicGen.get_pretrained("medium")
 
         if debug:
             print("+ RLModelの初期化が完了しました。")
@@ -126,21 +122,18 @@ class RLModel:
 
         if debug or self.debug:
             print(f"+ {prompt} の音楽を選択しました")
-            print("+ MusicGenモデルを生成します。")
+            # print("+ MusicGenモデルを生成します。")
 
-        # 音楽生成モデルの生成
-        music_gen: MusicGen = MusicGen.get_pretrained("small")  # TODO: モデルサイズの考察
-        music_gen.set_generation_params(
+        # 音楽生成モデルの設定
+        self.music_gen.set_generation_params(
             use_sampling=True,
             top_k=250,
             duration=duration
         )
-        if debug or self.debug:
-            print("+ モデルをロードしました。\n+ 音楽を生成します。")
 
         # テキストから音楽の生成
         start = time.perf_counter()
-        music: torch.Tensor = music_gen.generate(
+        music: torch.Tensor = self.music_gen.generate(
             descriptions=[prompt],
             progress=True
         )

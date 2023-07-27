@@ -64,7 +64,7 @@ class OpenCALM(threading.Thread):
         lon = location.longitude
 
         return str(lat), str(lon)
-    
+
     def get_weather(self):
         # 天気API使用
         load_dotenv()
