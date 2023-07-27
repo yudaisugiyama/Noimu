@@ -34,11 +34,11 @@ def get_s3():
     return s3
 
 def plot(s3, sleep_time):
-    try:
-        s3.Object(BUCKET_NAME, "sleep_data.csv").download_file(CSV_FILE_PATH)
-        print("+ [3] Downloaded csvfile.")
-    except Exception as e:
-        print(f"DOWNLOAD ERROR: {e}")
+    # try:
+    #     s3.Object(BUCKET_NAME, "sleep_data.csv").download_file(CSV_FILE_PATH)
+    #     print("+ [3] Downloaded csvfile.")
+    # except Exception as e:
+    #     print(f"DOWNLOAD ERROR: {e}")
 
     # 現在の日付を取得
     today = datetime.now()
@@ -72,9 +72,9 @@ def plot(s3, sleep_time):
     fontsize = 20
 
     # グラフを描画
-    plt.figure(figsize=(9, 21))
+    plt.figure(figsize=(7, 10))
     plt.bar(dates, sleep_duration, color='cyan')  # 色を水色に変更
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=20)
     plt.grid(True)
     plt.tight_layout()
 
