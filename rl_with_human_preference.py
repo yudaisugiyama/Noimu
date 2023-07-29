@@ -13,7 +13,7 @@ from soundAI.rl_model import RLModel
 
 from dotenv import load_dotenv
 from utils import get_s3, plot
-from config import CSV_FILE_PATH, GRAPH_FILE_PATH, MUSIC_PATH, INTIIAL_MUSIC_PATH
+from config import CSV_FILE_PATH, GRAPH_FILE_PATH, MUSIC_PATH, INITIAL_MUSIC_PATH
 from config import feedback_queue, open_calm, event_control_queue, rl_completion_flag_queue
 
 

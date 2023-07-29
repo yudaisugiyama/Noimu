@@ -240,3 +240,6 @@ crashlytics-build.properties
 
 # music log files
 log/log_dqn/*.wav
+
+# mac
+__MACOSX/

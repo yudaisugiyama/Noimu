@@ -12,14 +12,17 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import threading
 from geopy.geocoders import Nominatim
 
+import test_calm
+
 
 class OpenCALM(threading.Thread):
     def __init__(self, prompt_queue, opencalm_generation_flag_queue, location):
         threading.Thread.__init__(self)
-        self.model_name = "cyberagent/open-calm-small"
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_name).to(self.device)
-        self.tokenizer = AutoTokenizer.from_pretrained("cyberagent/open-calm-small")
+        # self.model_name = "cyberagent/open-calm-small"
+        # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # self.model = AutoModelForCausalLM.from_pretrained(self.model_name).to(self.device)
+        # self.tokenizer = AutoTokenizer.from_pretrained("cyberagent/open-calm-small")
+        self.model = test_calm.model
 
         self.prompt_queue = prompt_queue
         self.opencalm_generation_flag_queue = opencalm_generation_flag_queue
@@ -38,19 +41,20 @@ class OpenCALM(threading.Thread):
             prompt = f"おはよ〜！今日の{self.location}の空は晴れだから、"
             # prompt = f"おはよ〜！今日の{self.location}の空は{self.weather}だから、"
 
-            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+            # inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
             with torch.no_grad():
-                tokens = self.model.generate(
-                    **inputs,
-                    max_new_tokens=64,
-                    do_sample=True,
-                    temperature=0.7,
-                    top_p=0.9,
-                    repetition_penalty=1.05,
-                    pad_token_id=self.tokenizer.pad_token_id,
-                )
+                # tokens = self.model.generate(
+                #     **inputs,
+                #     max_new_tokens=64,
+                #     do_sample=True,
+                #     temperature=0.7,
+                #     top_p=0.9,
+                #     repetition_penalty=1.05,
+                #     pad_token_id=self.tokenizer.pad_token_id,
+                # )
+                output = test_calm.generate(prompt=prompt)
 
-            output = self.tokenizer.decode(tokens[0], skip_special_tokens=True)
+            # output = self.tokenizer.decode(tokens[0], skip_special_tokens=True)
             output = output.replace('\n', '')
             self.prompt_queue.put(output)
 

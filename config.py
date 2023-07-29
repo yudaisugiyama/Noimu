@@ -11,7 +11,7 @@ STATIC_ROOT = "static"
 CSV_FILE_PATH = f"{STATIC_ROOT}/sleep_data.csv"
 GRAPH_FILE_PATH = f"{STATIC_ROOT}/graph.png"
 MUSIC_PATH = f"{STATIC_ROOT}/music.wav"
-INTIIAL_MUSIC_PATH = f"{STATIC_ROOT}/initial.wav"
+INITIAL_MUSIC_PATH = f"{STATIC_ROOT}/initial.wav"
 
 # キュー
 feedback_queue = Queue()

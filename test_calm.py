@@ -50,7 +50,7 @@ def generate_prompt(data_point):
 ### Response:"""
 
 # テキスト生成関数の定義
-def generate(prompt, maxTokens=128):
+def generate(prompt, maxTokens=128) -> str:
     # 推論
     input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.to(device)
     outputs = model.generate(
@@ -63,6 +63,8 @@ def generate(prompt, maxTokens=128):
         no_repeat_ngram_size=2,
     )
     outputs = outputs[0].tolist()
-    print(tokenizer.decode(outputs))
+    output = tokenizer.decode(outputs)
+    # print(output)
+    return output
 
-generate("おはよ〜！今日の長岡技術科学大学の空は晴れだから、")
+# generate("おはよ〜！今日の金沢の空は晴れだから、")
