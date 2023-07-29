@@ -59,7 +59,7 @@ class DQN(threading.Thread):
             audio_write(os.path.splitext(MUSIC_PATH)[0], wav.cpu(), 32000, strategy="loudness")
 
             # ログとっとく
-            self._log(prompt, wav)
+            # self._log(prompt, wav)
 
             # キューにプロンプトを送信する
             self.rl_completion_flag_queue.put(True)
