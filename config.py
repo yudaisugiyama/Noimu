@@ -17,6 +17,7 @@ feedback_queue = Queue()
 opencalm_prompt_queue = Queue()
 rl_completion_flag_queue = Queue()
 event_control_queue = Queue()
+opencalm_generation_flag_queue = Queue()
 
 # MQTTの設定
 CLIENT_ID = "noimu"
@@ -29,7 +30,7 @@ INFO_TOPIC = "info"
 
 # OpenCALMの設定
 LOCATION = "長岡技術科学大学"
-open_calm = OpenCALM(prompt_queue=opencalm_prompt_queue, location=LOCATION)
+open_calm = OpenCALM(prompt_queue=opencalm_prompt_queue, opencalm_generation_flag_queue=opencalm_generation_flag_queue, location=LOCATION)
 
 # AWSの設定
 REGION = "ap-northeast-1"

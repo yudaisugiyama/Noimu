@@ -14,7 +14,7 @@ from geopy.geocoders import Nominatim
 
 
 class OpenCALM(threading.Thread):
-    def __init__(self, prompt_queue, location):
+    def __init__(self, prompt_queue, opencalm_generation_flag_queue, location):
         threading.Thread.__init__(self)
         self.model_name = "cyberagent/open-calm-small"
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -22,6 +22,7 @@ class OpenCALM(threading.Thread):
         self.tokenizer = AutoTokenizer.from_pretrained("cyberagent/open-calm-small")
 
         self.prompt_queue = prompt_queue
+        self.opencalm_generation_flag_queue = opencalm_generation_flag_queue
         self.location = location
 
         # 天気情報取得
@@ -33,6 +34,7 @@ class OpenCALM(threading.Thread):
         # self.weather = self.response['weather'][0]['description']
 
         while True:
+            self.opencalm_generation_flag_queue.get()
             prompt = f"おはよ〜！今日の{self.location}の空は晴れだから、"
             # prompt = f"おはよ〜！今日の{self.location}の空は{self.weather}だから、"
 
@@ -51,7 +53,6 @@ class OpenCALM(threading.Thread):
             output = self.tokenizer.decode(tokens[0], skip_special_tokens=True)
             output = output.replace('\n', '')
             self.prompt_queue.put(output)
-            time.sleep(1)
 
 
     def get_location_info(self) -> tuple[str, str]:
