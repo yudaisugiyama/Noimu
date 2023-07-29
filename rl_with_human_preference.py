@@ -13,7 +13,7 @@ from soundAI.rl_model import RLModel
 
 from dotenv import load_dotenv
 from utils import get_s3, plot
-from config import CSV_FILE_PATH, GRAPH_FILE_PATH, MUSIC_PATH
+from config import CSV_FILE_PATH, GRAPH_FILE_PATH, MUSIC_PATH, INTIIAL_MUSIC_PATH
 from config import feedback_queue, open_calm, event_control_queue, rl_completion_flag_queue
 
 
@@ -49,11 +49,11 @@ def main():
 
     s3 = get_s3()
     # # 音ファイルアップロード
-    # try:
-    #     s3.Object(BUCKET_NAME, "music.wav").upload_file(MUSIC_PATH)
-    #     print("+ Uploaded soundfile.")
-    # except Exception as e:
-    #     print(f"UPLOAD ERROR: {e}")
+    try:
+        s3.Object(BUCKET_NAME, "music.wav").upload_file(INITIAL_MUSIC_PATH)
+        print("+ Uploaded soundfile.")
+    except Exception as e:
+        print(f"UPLOAD ERROR: {e}")
 
     while True:
         sleep_time = event_control_queue.get()
